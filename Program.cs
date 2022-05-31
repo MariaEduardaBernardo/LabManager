@@ -4,7 +4,9 @@ using LabManager.Repositories;
 using LabManager.Models;
 
 var databaseConfig = new DatabaseConfig();
+
 var databaseSetup = new DatabaseSetup(databaseConfig);
+
 var computerRepository = new ComputerRepository(databaseConfig);
 
 // Routing
@@ -44,9 +46,17 @@ if(modelName == "Computer")
         computerRepository.Update(computer);
     }
 
-        if(modelAction == "Delete")
+    if(modelAction == "Delete")
     {
         var id = Convert.ToInt32(args[2]);
         computerRepository.Delete(id);
+    }
+
+    if(modelAction == "Show")
+    {
+        var id = Convert.ToInt32(args[2]);
+        var computer = computerRepository.GetById(id);
+
+        Console.WriteLine("{0}, {1}, {2}", computer.Id, computer.Ram, computer.Processor);
     }
 }  
