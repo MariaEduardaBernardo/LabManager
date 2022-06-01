@@ -18,7 +18,7 @@ class DatabaseSetup
 
         var command = connection.CreateCommand();
         command.CommandText = @"
-            CREATE TABLE IF NOY EXISTS Computers(
+            CREATE TABLE IF NOT EXISTS Computers(
                 id int not null primary key,
                 ram varchar(100) not null,
                 processor varchar(100) not null
