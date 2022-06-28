@@ -1,54 +1,93 @@
 using LabManager.Database;
+using LabManager.Repositories;
 using LabManager.Models;
-using Microsoft.Data.Sqlite;
 
-namespace LabManager.Repositories;
-class LabRepository
+var databaseConfig = new DatabaseConfig();
+
+var databaseSetup = new DatabaseSetup(databaseConfig);
+
+var computerRepository = new ComputerRepository(databaseConfig);
+var labRepository = new LabRepository(databaseConfig);
+
+// Routing
+var modelName = args[0];
+var modelAction = args[1];
+
+if(modelName == "Computer")
 {
-    private readonly DatabaseConfig _databaseConfig;
-
-    public LabRepository(DatabaseConfig databaseConfig)
+    if(modelAction == "List")
     {
-        _databaseConfig = databaseConfig;
-    }
-
-    public List<Lab> GetAll()
-    {
-        var labs = new List<Lab>();
-
-        var connection = new SqliteConnection("Data Source=database.db");       
-        connection.Open();
-
-        var command = connection.CreateCommand();
-        command.CommandText = "SELECT * FROM Labs";
-        var reader = command.ExecuteReader();
-        while(reader.Read())
+        Console.WriteLine("Computer List");
+        foreach (var computer in computerRepository.GetAll())
         {
-            var id = reader.GetInt32(0);
-            var number = reader.GetInt32(1);
-            var name = reader.GetString(2);
-            var block = reader.GetString(3);
-            var lab = new Lab(id, number, name, block);
-            labs.Add(lab);
+            Console.WriteLine($"{computer.Id}, {computer.Ram}, {computer.Processor}");
         }
-        connection.Close();
-        return labs;
     }
 
-    public void Save(Lab lab)
+    if(modelAction == "New")
     {
-        var connection = new SqliteConnection(_databaseConfig.ConnectionString);
-        connection.Open();
+        var id = Convert.ToInt32(args[2]);
+        string ram = args[3];
+        string processor = args[4];
 
-        var command = connection.CreateCommand();
+        var computer = new Computer(id, ram, processor);
 
-        command.CommandText = "INSERT INTO Lab VALUES ($id, $number, $name, $block)";
-        command.Parameters.AddWithValue("$id", lab.Id);
-        command.Parameters.AddWithValue("$number", lab.Number);
-        command.Parameters.AddWithValue("$name", lab.Name);
-        command.Parameters.AddWithValue("$block", lab.Block);
-
-        command.ExecuteNonQuery();
-        connection.Close();
+        computerRepository.Save(computer);
     }
-} 
+
+    if(modelAction == "Show")
+    {
+        var id = Convert.ToInt32(args[2]);
+
+        if(computerRepository.ExistsById(id))
+        {
+            var computer = computerRepository.GetById(id);
+            
+            Console.WriteLine($"{computer.Id}, {computer.Ram}, {computer.Processor}");
+        } else {
+            Console.WriteLine($"O computador com ID {id} não existe.");
+        }
+    }
+
+    if(modelAction == "Update")
+    {
+        var id = Convert.ToInt32(args[2]);
+        string ram = args[3];
+        string processor = args[4];
+
+        var computer = new Computer(id, ram, processor);
+
+        computerRepository.Update(computer);
+    }
+
+    if(modelAction == "Delete")
+    {
+        var id = Convert.ToInt32(args[2]);
+        computerRepository.Delete(id);
+    }
+}
+
+if(modelName == "Lab")
+{
+    if(modelAction == "List")
+    {
+        Console.WriteLine("Lab List");
+        foreach (var lab in labRepository.GetAll())
+        {
+            Console.WriteLine($"{lab.Id}, {lab.Number}, {lab.Name}, {lab.Block}");
+        }
+    }
+
+    if(modelAction == "New")
+    {
+        // Console.WriteLine("Lab New");
+        var id = Convert.ToInt32(args[2]);
+        string number = args[3];
+        string name = args[4];
+        string block = args[5];
+
+        var lab = new Lab(id, number, name, block);
+
+        labRepository.Save(lab);
+    }
+}
