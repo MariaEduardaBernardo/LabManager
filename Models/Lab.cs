@@ -6,7 +6,7 @@ class Lab{
     public string Name { get; set; }
     public string Block { get; set; }
 
-    public Lab(int id, int number, string name, String block)
+    public Lab(int id, string number, string name, String block)
     {
         Id = id;
         Number = number;
