@@ -80,24 +80,31 @@ if(modelName == "Lab")
 
     if(modelAction == "New")
     {
+        // Console.WriteLine("Lab New");
         var id = Convert.ToInt32(args[2]);
         string number = args[3];
         string name = args[4];
         string block = args[5];
 
         var lab = new Lab(id, number, name, block);
-        
+
         labRepository.Save(lab);
     }
 
     if(modelAction == "Show")
     {
         var id = Convert.ToInt32(args[2]);
-        var lab = labRepository.GetById(id);
 
-        Console.WriteLine("{0}, {1}, {2}, {3}", lab.Id, lab.Number, lab.Name, lab.Block);
+        if(labRepository.ExistsById(id))
+        {
+            var lab = labRepository.GetById(id);
+            
+            Console.WriteLine($"{lab.Id}, {lab.Number}, {lab.Name}, {lab.Block}");
+        } else {
+            Console.WriteLine($"O laboratório com ID {id} não existe.");
+        }
     }
-    
+
     if(modelAction == "Update")
     {
         var id = Convert.ToInt32(args[2]);
@@ -106,9 +113,10 @@ if(modelName == "Lab")
         string block = args[5];
 
         var lab = new Lab(id, number, name, block);
+
         labRepository.Update(lab);
     }
-    
+
     if(modelAction == "Delete")
     {
         var id = Convert.ToInt32(args[2]);
